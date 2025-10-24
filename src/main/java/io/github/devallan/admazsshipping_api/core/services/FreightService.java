@@ -73,13 +73,8 @@ public record FreightService(FreightRepositoryPort freightRepositoryPort,
         }
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("property.id").ascending());
-        List<ValuePropertyFreight> values = valuePropertyFreightRepositoryPort.findByFreightId(freightId, search, pageable);
 
-        if (values.isEmpty()) {
-            throw new IllegalArgumentException("Não foram encontrados valores de propriedade para esse frete.");
-        }
-
-        return values;
+        return valuePropertyFreightRepositoryPort.findByFreightId(freightId, search, pageable);
     }
 
     @Override
