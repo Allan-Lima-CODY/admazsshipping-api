@@ -14,19 +14,19 @@ public record PropertyService(PropertyRepositoryPort propertyRepositoryPort,
     public Property createProperty(Property property) {
         Property existing = propertyRepositoryPort.findByName(property.getName());
         if (existing != null && existing.getCustomer().getId().equals(property.getCustomer().getId())) {
-            throw new IllegalArgumentException("A property '" + property.getName() + "' already exists for this customer.");
+            throw new IllegalArgumentException("Uma propriedade '" + property.getName() + "' já existe para o seu cliente.");
         }
 
         if (property.getCustomer() == null) {
-            throw new IllegalArgumentException("Customer must be provided for the property.");
+            throw new IllegalArgumentException("O cliente precisa ser fornecido para a propriedade.");
         }
 
         if (property.getName() == null || property.getName().isBlank()) {
-            throw new IllegalArgumentException("Property name cannot be empty.");
+            throw new IllegalArgumentException("Nome da propriedade não pode ser vazio.");
         }
 
         if (property.getType() == null || property.getType().isBlank()) {
-            throw new IllegalArgumentException("Property type cannot be empty.");
+            throw new IllegalArgumentException("A propriedade precisa ter um tipo.");
         }
 
         return propertyRepositoryPort.createProperty(property);
@@ -47,12 +47,12 @@ public record PropertyService(PropertyRepositoryPort propertyRepositoryPort,
     public void deleteProperty(Long id) {
         Property property = propertyRepositoryPort.findById(id);
         if (property == null) {
-            throw new IllegalArgumentException("Property not found.");
+            throw new IllegalArgumentException("Propriedade não encontrada.");
         }
 
         boolean isInUse = valuePropertyFreightRepositoryPort.existsByPropertyId(id);
         if (isInUse) {
-            throw new IllegalArgumentException("Cannot delete property: it is associated with one or more freights.");
+            throw new IllegalArgumentException("Há valores associados para a propriedade.");
         }
 
         propertyRepositoryPort.deleteProperty(id);
@@ -63,11 +63,11 @@ public record PropertyService(PropertyRepositoryPort propertyRepositoryPort,
     public Property updateProperty(Property partialProperty) {
         Property property = propertyRepositoryPort.findById(partialProperty.getId());
         if (property == null) {
-            throw new IllegalArgumentException("Property not found");
+            throw new IllegalArgumentException("Propriedade não encontrada.");
         }
 
         if (partialProperty.getName() == null || partialProperty.getName().isBlank()) {
-            throw new IllegalArgumentException("Property name cannot be empty.");
+            throw new IllegalArgumentException("Nome da propriedade não pode ser vazio.");
         }
 
         property.setName(partialProperty.getName());
@@ -79,7 +79,7 @@ public record PropertyService(PropertyRepositoryPort propertyRepositoryPort,
     public Property findById(Long id) {
         Property property = propertyRepositoryPort.findById(id);
         if (property == null) {
-            throw new IllegalArgumentException("Property not found");
+            throw new IllegalArgumentException("Propriedade não encontrada.");
         }
         return property;
     }

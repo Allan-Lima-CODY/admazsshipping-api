@@ -21,25 +21,25 @@ public record FreightService(FreightRepositoryPort freightRepositoryPort,
     @Override
     public Freight createFreight(Freight freight) {
         if (freight.getCustomer() == null) {
-            throw new IllegalArgumentException("Customer must be provided for the freight.");
+            throw new IllegalArgumentException("Um usuário precisa ser fornecido para o frete.");
         }
 
         if (freight.getCreatedAt() == null) {
-            throw new IllegalArgumentException("Creation date must be provided.");
+            throw new IllegalArgumentException("Uma data precisa ser fornecida.");
         }
 
         if (freight.getName() == null || freight.getName().isBlank()) {
-            throw new IllegalArgumentException("Freight name must be provided.");
+            throw new IllegalArgumentException("O frete deve ter um nome.");
         }
 
         boolean nameExists = freightRepositoryPort.existsByName(freight.getName());
         if (nameExists) {
-            throw new IllegalArgumentException("A freight with this name already exists.");
+            throw new IllegalArgumentException("Um frete com esse nome já existe.");
         }
 
         var existsProperties = propertyRepositoryPort.findAllByCustomer(freight.getCustomer().getId());
         if (existsProperties.isEmpty()) {
-            throw new IllegalArgumentException("Customer has no properties configured — cannot create freight.");
+            throw new IllegalArgumentException("Não é possível criar um frete sem ter propriedades configuradas.");
         }
 
         if (freight.getValues() != null && !freight.getValues().isEmpty()) {
@@ -48,12 +48,12 @@ public record FreightService(FreightRepositoryPort freightRepositoryPort,
                 Long propertyId = (value.getProperty() != null) ? value.getProperty().getId() : null;
 
                 if (propertyId == null) {
-                    throw new IllegalArgumentException("Each value must have a valid property ID.");
+                    throw new IllegalArgumentException("Os valores precisam de uma propriedade.");
                 }
 
                 if (!uniquePropertyIds.add(propertyId)) {
                     throw new IllegalArgumentException(
-                            "Duplicate property detected in freight creation: property ID " + propertyId
+                            "Propriedade duplicada: " + propertyId
                     );
                 }
             }
@@ -65,18 +65,18 @@ public record FreightService(FreightRepositoryPort freightRepositoryPort,
     @Override
     public List<ValuePropertyFreight> getFreightValues(Long freightId, String search, int page, int size) {
         if (freightId == null || freightId <= 0) {
-            throw new IllegalArgumentException("Invalid freight ID.");
+            throw new IllegalArgumentException("ID de frete inválido.");
         }
 
         if (page < 0 || size <= 0) {
-            throw new IllegalArgumentException("Invalid pagination parameters.");
+            throw new IllegalArgumentException("Parâmetro de paginação inválido");
         }
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("property.id").ascending());
         List<ValuePropertyFreight> values = valuePropertyFreightRepositoryPort.findByFreightId(freightId, search, pageable);
 
         if (values.isEmpty()) {
-            throw new IllegalArgumentException("No property values found for this freight.");
+            throw new IllegalArgumentException("Não foram encontrados valores de propriedade para esse frete.");
         }
 
         return values;
@@ -85,11 +85,11 @@ public record FreightService(FreightRepositoryPort freightRepositoryPort,
     @Override
     public void deleteFreightValues(Long freightId, List<Long> propertyIds) {
         if (freightId == null || freightId <= 0) {
-            throw new IllegalArgumentException("Invalid freight ID.");
+            throw new IllegalArgumentException("ID de frete inválido.");
         }
 
         if (propertyIds == null || propertyIds.isEmpty()) {
-            throw new IllegalArgumentException("No property was selected to be unlinked!");
+            throw new IllegalArgumentException("Nenhuma propriedade foi selecionada!");
         }
 
         valuePropertyFreightRepositoryPort.deleteByFreightAndPropertyIds(freightId, propertyIds);
@@ -98,20 +98,20 @@ public record FreightService(FreightRepositoryPort freightRepositoryPort,
     @Override
     public void updateFreightValues(Long freightId, List<ValuePropertyFreight> values) {
         if (freightId == null || freightId <= 0) {
-            throw new IllegalArgumentException("Invalid freight ID.");
+            throw new IllegalArgumentException("ID de frete inválido.");
         }
 
         if (values == null || values.isEmpty()) {
-            throw new IllegalArgumentException("No values provided for update.");
+            throw new IllegalArgumentException("Valores não fornecidos para atualização.");
         }
 
         for (ValuePropertyFreight value : values) {
             if (value.getProperty() == null || value.getProperty().getId() == null) {
-                throw new IllegalArgumentException("Each value must have a valid property ID.");
+                throw new IllegalArgumentException("Cada valor precisa de uma propriedade.");
             }
 
             if (value.getValue() == null || value.getValue().isBlank()) {
-                throw new IllegalArgumentException("Each value must have a non-empty value.");
+                throw new IllegalArgumentException("O valor não pode ser vazio.");
             }
 
             valuePropertyFreightRepositoryPort.updateValueByFreightAndProperty(
@@ -125,7 +125,7 @@ public record FreightService(FreightRepositoryPort freightRepositoryPort,
     @Override
     public void updateFreightName(Freight freight) {
         if (freight.getId() == null || freight.getId() <= 0) {
-            throw new IllegalArgumentException("Invalid freight ID.");
+            throw new IllegalArgumentException("ID de frete inválido.");
         }
 
         if (freight.getName() == null || freight.getName().isBlank()) {
@@ -143,12 +143,12 @@ public record FreightService(FreightRepositoryPort freightRepositoryPort,
     @Override
     public void deleteFreightAndValues(Long freightId) {
         if (freightId == null || freightId <= 0) {
-            throw new IllegalArgumentException("Invalid freight ID.");
+            throw new IllegalArgumentException("ID de frete inválido.");
         }
 
         Freight freight = freightRepositoryPort.findById(freightId);
         if (freight == null) {
-            throw new IllegalArgumentException("Freight not found.");
+            throw new IllegalArgumentException("Frete não encontrado.");
         }
 
         valuePropertyFreightRepositoryPort.deleteAllByFreightId(freightId);

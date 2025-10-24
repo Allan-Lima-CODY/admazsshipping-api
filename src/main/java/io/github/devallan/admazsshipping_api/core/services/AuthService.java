@@ -20,7 +20,7 @@ public class AuthService implements AuthServicePort {
         Customer customer = customerRepositoryPort.findByEmail(request.getEmail());
 
         if (customer == null || !passwordEncoder.matches(request.getPassword(), customer.getPassword())) {
-            throw new IllegalArgumentException("Email or password is incorrect!");
+            throw new IllegalArgumentException("Email ou Senha incorretos!");
         }
 
         String token = jwtUtil.generateToken(customer.getId());

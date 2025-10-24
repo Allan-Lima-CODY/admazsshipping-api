@@ -11,10 +11,10 @@ public record CustomerService(CustomerRepositoryPort customerRepositoryPort) imp
     @Override
     public Customer createCustomer(Customer customer) {
         if (customerRepositoryPort.findByName(customer.getName()) != null)
-            throw new IllegalArgumentException("A customer with the name '" + customer.getName() + "' already exists.");
+            throw new IllegalArgumentException("Um cliente com o nome '" + customer.getName() + "' já existe.");
 
         if (customerRepositoryPort.findByEmail(customer.getEmail()) != null)
-            throw new IllegalArgumentException("A customer with the email '" + customer.getEmail() + "' already exists.");
+            throw new IllegalArgumentException("Um cliente com o email '" + customer.getEmail() + "' já existe.");
 
         customer.setPassword(passwordEncoder.encode(customer.getPassword()));
 
